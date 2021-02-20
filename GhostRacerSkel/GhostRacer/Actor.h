@@ -41,7 +41,7 @@ public: //TODO: GO IN LATER AND UDPATE EVERYTHING TO VIRTUAL AS NECESSARY
                int holyWaterAmount, int hitPoints);
     virtual ~GhostRacer(){ }
     virtual void doSomething();
-    int getHolyWaterAmount() const;
+    int getHolyWaterAmount() const; //TODO: CHECK ARE THE NEXT FOUR ACCESSOR/MUTATORS NECESSARY??
     void changeHolyWaterAmount(int waterChange);
     int getHitPoints() const;
     void changeHitPoints(int hpChange);

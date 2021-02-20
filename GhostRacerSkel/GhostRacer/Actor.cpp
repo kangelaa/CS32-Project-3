@@ -67,8 +67,9 @@ GhostRacer::GhostRacer(int imageID, double startX, double startY,
 : Actor(imageID, startX, startY, startDirection, size, depth, vertSpeed, horizSpeed, collisionAW, sw), m_holyWaterAmount(holyWaterAmount), m_hitPoints(hitPoints)
 { }
 
+//has GhostRacer read in user input (key press) and update direction/x/y accordingly
 void GhostRacer::doSomething(){
-    //TODO: FILL IN!
+    //TODO: FINISH UP for pt 2!
     
     //if GhostRacer isn't alive, return immediately
     if (getHitPoints() <= 0){    //TODO: CHECK this is called on the right GhostRacer object right? (this->)?
@@ -134,16 +135,30 @@ void GhostRacer::changeHitPoints(int hpChange){
 
 // BorderLine MEMBER FUNCTION IMPLEMENTATIONS
 
+//Constructor
 BorderLine::BorderLine(int imageID, double startX, double startY,
                        int startDirection, double size, int depth,
                        int vertSpeed, int horizSpeed, bool collisionAW, StudentWorld* sw)
 : Actor(imageID, startX, startY, startDirection, size, depth, vertSpeed, horizSpeed, collisionAW, sw)
 { }
 
+//has BorderLine lines move down the screen
 void BorderLine::doSomething(){
     //TODO: IMPLEMENT!
+    
+    //move BorderLine using algorithm
+    int vert_speed = getVertSpeed() - (getStudentWorld()->getPointerToGhostRacer()->getVertSpeed());
+    int horiz_speed = getHorizSpeed();
+    double new_y = getY() + vert_speed;
+    double new_x = getX() + horiz_speed;
+    moveTo(new_x, new_y);   //update x and y location for BorderLine w/ moveTo()
+    
+    //if BorderLine leaves the screen, set its status to not-alive, so it will be removed by StudentWorld later in this tick
+    if (getX() < 0 || getX() > VIEW_WIDTH || getY() < 0 || getY() > VIEW_HEIGHT){
+        changeAlive(false);
+        return;
+    }
 }
-
 
 
 

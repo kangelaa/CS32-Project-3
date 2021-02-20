@@ -74,7 +74,7 @@ int StudentWorld::move()
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
     decLives();
-    return GWSTATUS_PLAYER_DIED;
+    return GWSTATUS_CONTINUE_GAME;
 }
 
 void StudentWorld::cleanUp()
@@ -94,4 +94,9 @@ void StudentWorld::cleanUp()
 //Destructor that frees any remaining dynamically allocated data that hasn't been freed before StudentWorld is destroyed
 StudentWorld::~StudentWorld(){
     cleanUp();
+}
+
+//Accessor
+GhostRacer* StudentWorld::getPointerToGhostRacer() const {
+    return m_pointerToGhostRacer;
 }
