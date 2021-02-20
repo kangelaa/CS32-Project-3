@@ -22,6 +22,7 @@ public:     //TODO: GO IN LATER AND CHANGE EVERYTHING TO VIRTUAL/VIRTUAL PURE/CO
     int getHorizSpeed() const;
     void changeHorizSpeed(int hSpeedChange); //parameter passed is the increment/decrement amount
     bool isCollisionAW() const;
+    StudentWorld* getStudentWorld() const;
 private:
     bool m_alive;
     int m_vertSpeed;

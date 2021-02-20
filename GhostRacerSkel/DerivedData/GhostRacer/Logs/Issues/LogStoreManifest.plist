@@ -62,6 +62,34 @@
 			<key>uniqueIdentifier</key>
 			<string>62CF6614-E592-4480-A106-A3E6FD829FC8</string>
 		</dict>
+		<key>66EA2128-ED2E-4517-90C7-DF9F0DC066FF</key>
+		<dict>
+			<key>className</key>
+			<string>IDEActivityLogMajorGroupSection</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.target.product-type.tool</string>
+			<key>fileName</key>
+			<string>66EA2128-ED2E-4517-90C7-DF9F0DC066FF.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+			</dict>
+			<key>signature</key>
+			<string>GhostRacer-hfuszcawanhvdsftedelakvdzotq</string>
+			<key>timeStartedRecording</key>
+			<real>635518436.65835297</real>
+			<key>timeStoppedRecording</key>
+			<real>635518437.76295102</real>
+			<key>title</key>
+			<string>Build target GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>66EA2128-ED2E-4517-90C7-DF9F0DC066FF</string>
+		</dict>
 	</dict>
 	<key>preserveOldLogs</key>
 	<true/>

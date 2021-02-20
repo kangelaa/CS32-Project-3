@@ -84,8 +84,11 @@ void StudentWorld::cleanUp()
     
     //iterates through the list container, deleting each Actor
     for (list<Actor*>::iterator p = m_listOfActors.begin(); p != m_listOfActors.end(); p++){
-        delete *p; //TODO: CHECK THIS IS CORRECT? + do i have to delete the container objects (pointers)?
+        delete (*p); //TODO: CHECK THIS IS CORRECT?
     }
+    
+    //delete each object (pointer) in the container, emptying the container
+    m_listOfActors.clear();
 }
 
 //Destructor that frees any remaining dynamically allocated data that hasn't been freed before StudentWorld is destroyed

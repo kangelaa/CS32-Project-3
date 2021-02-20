@@ -3,6 +3,8 @@
 
 // Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
 #include "GameConstants.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 // Actor MEMBER FUNCTION IMPLEMENTATIONS
 
@@ -50,6 +52,11 @@ bool Actor::isCollisionAW() const {
     return m_collisionAW;
 }
 
+//Accessor
+StudentWorld* Actor::getStudentWorld() const {
+    return m_sw;
+}
+
 // GhostRacer MEMBER FUNCTION IMPLEMENTATIONS
 
 //Constructor
@@ -63,6 +70,46 @@ GhostRacer::GhostRacer(int imageID, double startX, double startY,
 void GhostRacer::doSomething(){
     //TODO: FILL IN!
     
+    //if GhostRacer isn't alive, return immediately
+    if (getHitPoints() <= 0){    //TODO: CHECK this is called on the right GhostRacer object right? (this->)?
+        return;
+    }
+    
+    //getting user input (as key presses)
+    int ch;
+    if (getStudentWorld()->getKey(ch)){
+        //user hit a key during this tick!
+        switch (ch){
+            case KEY_PRESS_LEFT:
+                if (getDirection() < 114){
+                    setDirection(getDirection() + 8);
+                }
+                break;
+            case KEY_PRESS_RIGHT:
+                if (getDirection() > 66){
+                    setDirection(getDirection() - 8);
+                }
+                break;
+            case KEY_PRESS_UP:
+                if (getVertSpeed() < 5){
+                    changeVertSpeed(1);
+                }
+                break;
+            case KEY_PRESS_DOWN:
+                if (getVertSpeed() > -1){
+                    changeVertSpeed(-1);
+                }
+                break;
+        }
+    }
+    
+    //move GhostRacer based on specified movement algorithm
+    double max_shift_per_tick = 4.0;
+    int direction = getDirection();
+    double delta_x = cos((direction*M_PI)/180) * max_shift_per_tick;    //convert direction from degrees to rad to use as argument for cos()
+    double cur_x = getX();
+    double cur_y = getY();
+    moveTo(cur_x+delta_x, cur_y);   //update x and y location for GhostRacer w/ moveTo()
 }
 
 //Accessor
