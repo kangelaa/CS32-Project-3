@@ -31,9 +31,9 @@ int StudentWorld::init()
     
     //add M white border line objects (M = VIEW_HEIGHT / (4*SPRITE_HEIGHT)) to separate the three lanes (2 sets of "lines")
     for (int j=0; j<(VIEW_HEIGHT / (4*SPRITE_HEIGHT)); j++){
-        m_listOfActors.push_back(new BorderLine(IID_WHITE_BORDER_LINE, LEFT_EDGE + ROAD_WIDTH/3, j *
+        m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, LEFT_EDGE + ROAD_WIDTH/3, j *
                                                 (4*SPRITE_HEIGHT), 0, 2.0, 2, -4, 0, false, this));
-        m_listOfActors.push_back(new BorderLine(IID_WHITE_BORDER_LINE, RIGHT_EDGE - ROAD_WIDTH/3, j *
+        m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, RIGHT_EDGE - ROAD_WIDTH/3, j *
                                                 (4*SPRITE_HEIGHT), 0, 2.0, 2, -4, 0, false, this));
     }
     
@@ -71,10 +71,53 @@ int StudentWorld::move()
 //     // continue playing the current level
 //    return GWSTATUS_CONTINUE_GAME;
     
+    if (getPointerToGhostRacer()->isAlive()){
+        getPointerToGhostRacer()->doSomething();
+    }
+    
+    for (list<Actor*>::iterator p = m_listOfActors.begin(); p != m_listOfActors.end(); p++){
+        if ((*p)->isAlive()){
+            (*p)->doSomething();
+            //TODO: FIX/FINISH IMPLEMENTATION FOR PT 2
+//            if (!(getPointerToGhostRacer()->isAlive())){
+//                return GWSTATUS_PLAYER_DIED;
+//            }
+        }
+    }
+    
+    // Remove newly-dead actors after each tick
+    for (list<Actor*>::iterator p = m_listOfActors.begin(); p != m_listOfActors.end(); p++){
+        if (!((*p)->isAlive())){
+            delete (*p);
+            p = m_listOfActors.erase(p);    //erase pointer and reassign p to point to object following the one erased
+            p--;    //decrement p to prepare for next iteration of loop
+        }
+    }
+    
+    // Potentially add new actors to the game
+    double new_border_y = VIEW_HEIGHT - SPRITE_HEIGHT;
+    double m_last_white_y_added = m_listOfActors.front()->getY();   //TODO: MAKE SURE UR ONLY PUSHING WHITE BORDERS TO FRONT!!! EVERYTHING ELSE TO BACK!
+    double delta_y = new_border_y - m_last_white_y_added;
+    if (delta_y >= SPRITE_HEIGHT){
+        m_listOfActors.push_back(new BorderLine(IID_YELLOW_BORDER_LINE, ROAD_CENTER - ROAD_WIDTH/2, new_border_y, 0, 2.0, 2, -4, 0, false, this));
+        m_listOfActors.push_back(new BorderLine(IID_YELLOW_BORDER_LINE, ROAD_CENTER + ROAD_WIDTH/2, new_border_y, 0, 2.0, 2, -4, 0, false, this));
+    }
+    if (delta_y >= 4*SPRITE_HEIGHT){
+        m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH/3, new_border_y, 0, 2.0, 2, -4, 0, false, this));
+        m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH/3, new_border_y, 0, 2.0, 2, -4, 0, false, this));
+    }
+    
+    // Update the Game Status Line
+    
+    // the player hasn’t completed the current level and hasn’t died, so
+    // continue playing the current level
+    return GWSTATUS_CONTINUE_GAME;
+    
+    
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
-    decLives();
-    return GWSTATUS_CONTINUE_GAME;
+//    decLives();
+//    return GWSTATUS_CONTINUE_GAME;
 }
 
 void StudentWorld::cleanUp()

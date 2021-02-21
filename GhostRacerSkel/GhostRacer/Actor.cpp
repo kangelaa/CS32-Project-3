@@ -147,7 +147,7 @@ void BorderLine::doSomething(){
     //TODO: IMPLEMENT!
     
     //move BorderLine using algorithm
-    int vert_speed = getVertSpeed() - (getStudentWorld()->getPointerToGhostRacer()->getVertSpeed());
+    int vert_speed = getVertSpeed() - (getStudentWorld()->getPointerToGhostRacer()->getVertSpeed());    //TODO: CHECK IS THIS CORRECT?
     int horiz_speed = getHorizSpeed();
     double new_y = getY() + vert_speed;
     double new_x = getX() + horiz_speed;
