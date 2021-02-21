@@ -76,9 +76,31 @@ void GhostRacer::doSomething(){
         return;
     }
     
-    //getting user input (as key presses)
     int ch;
-    if (getStudentWorld()->getKey(ch)){
+    //check for collision w/ BorderLine
+    int LEFT_EDGE = ROAD_CENTER - ROAD_WIDTH/2;
+    int RIGHT_EDGE = ROAD_CENTER + ROAD_WIDTH/2;
+    if (getX() <= LEFT_EDGE){
+        if (getDirection() > 90){
+            changeHitPoints(-10);   //TODO: DO I NEED TO CHECK FOR 0 HP HERE? (update pt2 w/ universal helper function (collision, damaged)
+            if (getHitPoints() <= 0){
+                changeAlive(false);
+                getStudentWorld()->playSound(SOUND_PLAYER_DIE);     //TODO: CREATE HELPER FUNC FOR THIS
+            }
+        }
+        setDirection(82);
+        getStudentWorld()->playSound(SOUND_VEHICLE_CRASH);
+    } else if (getX() >= RIGHT_EDGE){
+        if (getDirection() < 90){
+            changeHitPoints(-10);   //TODO: DO I NEED TO CHECK FOR 0 HP HERE? (update pt2 w/ universal helper function (collision, damaged)
+            if (getHitPoints() <= 0){
+                changeAlive(false);
+                getStudentWorld()->playSound(SOUND_PLAYER_DIE);     //TODO: CREATE HELPER FUNC FOR THIS
+            }
+        }
+        setDirection(98);
+        getStudentWorld()->playSound(SOUND_VEHICLE_CRASH);
+    } else if (getStudentWorld()->getKey(ch)){   //check for user input (key press)  //TODO: should this be an elif or separate if statement? (if separate, move int ch down too) (should be fine during test comparison..)
         //user hit a key during this tick!
         switch (ch){
             case KEY_PRESS_LEFT:

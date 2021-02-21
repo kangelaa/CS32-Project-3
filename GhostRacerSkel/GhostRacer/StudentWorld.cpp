@@ -113,7 +113,6 @@ int StudentWorld::move()
     // continue playing the current level
     return GWSTATUS_CONTINUE_GAME;
     
-    
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
 //    decLives();
