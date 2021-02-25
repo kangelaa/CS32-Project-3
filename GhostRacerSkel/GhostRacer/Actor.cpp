@@ -15,7 +15,6 @@ Actor::Actor(int imageID, double startX, double startY,
 : GraphObject(imageID, startX, startY, startDirection, size, depth), m_sw(sw)
 {
     m_alive = true;
-    m_vertSpeed = 0; //TODO: NECESSARY?
 }
 
 //Accessor
@@ -347,7 +346,9 @@ HumanPedestrian::HumanPedestrian(int imageID, double startX, double startY,
                                  StudentWorld* sw,
                                  int hitPoints)
 : IntelligentAgent(imageID, startX, startY, startDirection, size, sw, hitPoints)
-{ }
+{
+    setVertSpeed(-4);
+}
 
 void HumanPedestrian::doSomething(){
     //if human ped isn't alive, return immediately
@@ -358,12 +359,11 @@ void HumanPedestrian::doSomething(){
     //if human ped overlaps w/ GR, player loses life, level ends (GR hp set to 0 and alive set to false), return immediately (#2)
     if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
         getStudentWorld()->decLives();  //decrease lives by one
-        getStudentWorld()->getOverlappingGhostRacer(this)->setHitPoints(0); //update GR hp to 0
-        getStudentWorld()->getOverlappingGhostRacer(this)->changeAlive(false);  //update GR alive status to false
+        getStudentWorld()->getOverlappingGhostRacer(this)->takeDamageAndPossiblyDie(100);
         return;
     }
     
-    //move, update plan distance
+    //move, update plan distance (#3-6)
     moveAndPossiblyPickPlan();
 }
 
@@ -384,7 +384,65 @@ bool HumanPedestrian::takeDamageAndPossiblyDie(int hp){
 
 // ZombiePedestrian MEMBER FUNCTION IMPLEMENTATIONS
 
-//Private
+ZombiePedestrian::ZombiePedestrian(int imageID, double startX, double startY,
+                 int startDirection, double size,
+                 StudentWorld* sw,
+                 int hitPoints)
+: IntelligentAgent(imageID, startX, startY, startDirection, size, sw, hitPoints)
+{
+    setVertSpeed(-4);
+    m_ticksBeforeGrunt = 0;
+}
+
+void ZombiePedestrian::doSomething(){
+    //if zombie ped isn't alive, return immediately
+    if (getHitPoints() <= 0){
+        return;
+    }
+    
+    //if zombie ped overlaps w/ GR (#2)
+    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
+        getStudentWorld()->getOverlappingGhostRacer(this)->takeDamageAndPossiblyDie(5);     //GR damaged (-5)
+        bool died = takeDamageAndPossiblyDie(2);    //zombie ped damaged (-2), passes bool = true if died, false if alive
+        zombiePedSpecificDamage(died);
+        return;
+    }
+    
+    //  zombie ped grunts every 20 ticks if it is close enough to (x-axis) GR (#3)
+    if ((getX() - getStudentWorld()->getPointerToGhostRacer()->getX()) <= 30 && (getX() - getStudentWorld()->getPointerToGhostRacer()->getX()) >= -30 && getY() > getStudentWorld()->getPointerToGhostRacer()->getY()){
+        setDirection(270);
+        if (getX() < getStudentWorld()->getPointerToGhostRacer()->getX()){
+            setHorizSpeed(1);
+        } else if (getX() > getStudentWorld()->getPointerToGhostRacer()->getX()){
+            setHorizSpeed(-1);
+        } else {
+            setHorizSpeed(0);
+        }
+        m_ticksBeforeGrunt--;
+        if (m_ticksBeforeGrunt <= 0){
+            getStudentWorld()->playSound(SOUND_ZOMBIE_ATTACK);
+            m_ticksBeforeGrunt = 20;
+        }
+    }
+    
+    //move, update plan distance (#4-6)
+    moveAndPossiblyPickPlan();
+}
+
+//TODO: IMPLEMENT? !
+bool ZombiePedestrian::beSprayedIfAppropriate(){
+    return true;
+}
+
+int ZombiePedestrian::soundWhenHurt() const {
+    return SOUND_PED_HURT;
+}
+
+int ZombiePedestrian::soundWhenDie() const {
+    return SOUND_PED_DIE;
+}
+
+//Private functions
 bool ZombiePedestrian::updateMovementPlan(){
     if (getMovementPlan() > 0){
         setMovementPlan(getMovementPlan()-1);
@@ -393,7 +451,22 @@ bool ZombiePedestrian::updateMovementPlan(){
     return false;
 }
 
+void ZombiePedestrian::zombiePedSpecificDamage(bool died){
+    if (died){
+        if (getStudentWorld()->getOverlappingGhostRacer(this) == nullptr){
+            int chance = randInt(1, 5);
+            if (chance == 1){
+                //TODO: IMPLEMENT ADD A NEW GOODIE AT CURRENT POS pg 37
+            }
+        }
+        getStudentWorld()->increaseScore(150);
+    } else {
+        getStudentWorld()->playSound(SOUND_PED_HURT);
+    }
+}
+
 // ZombieCab MEMBER FUNCTION IMPLEMENTATIONS
+
 void ZombieCab::pickNewPlan(){
     //pick new movement plan for zombie cab
         //movement plan

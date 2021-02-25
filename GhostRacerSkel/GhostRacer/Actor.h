@@ -142,6 +142,8 @@ public:
     virtual int soundWhenDie() const;
 private:
     virtual bool updateMovementPlan();
+    void zombiePedSpecificDamage(bool died);
+    int m_ticksBeforeGrunt;
 };
 
 class ZombieCab : public IntelligentAgent
