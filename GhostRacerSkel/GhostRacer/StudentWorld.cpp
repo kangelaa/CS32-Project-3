@@ -18,23 +18,26 @@ StudentWorld::StudentWorld(string assetPath)
 
 int StudentWorld::init()
 {
+    //initialize m_numSoulsToSave with the # for the level
+    m_numSoulsToSave = 2 * getLevel() + 5;
+    
     //add new GhostRacer and initialize pointer to point to it
-    m_pointerToGhostRacer = new GhostRacer(IID_GHOST_RACER, 128, 32, 90, 4.0, 0, 0, 0, true, this, 10, 100);
+    m_pointerToGhostRacer = new GhostRacer(IID_GHOST_RACER, 128, 32, 90, 4.0, 0, 0, this, 10);
 
     double LEFT_EDGE = ROAD_CENTER - ROAD_WIDTH/2;
     double RIGHT_EDGE = ROAD_CENTER + ROAD_WIDTH/2;
     //add N yellow border line objects (N = VIEW_HEIGHT / SPRITE_HEIGHT) on each side of the road (L/R)
     for (int j=0; j<(VIEW_HEIGHT / SPRITE_HEIGHT); j++){
-        m_listOfActors.push_back(new BorderLine(IID_YELLOW_BORDER_LINE, LEFT_EDGE, j * SPRITE_HEIGHT, 0, 2.0, 2, -4, 0, false, this));
-        m_listOfActors.push_back(new BorderLine(IID_YELLOW_BORDER_LINE, RIGHT_EDGE, j * SPRITE_HEIGHT, 0, 2.0, 2, -4, 0, false, this));
+        addActor(new BorderLine(IID_YELLOW_BORDER_LINE, LEFT_EDGE, j * SPRITE_HEIGHT, 0, 2.0, 2, -4, this));
+        addActor(new BorderLine(IID_YELLOW_BORDER_LINE, RIGHT_EDGE, j * SPRITE_HEIGHT, 0, 2.0, 2, -4, this));
     }
     
     //add M white border line objects (M = VIEW_HEIGHT / (4*SPRITE_HEIGHT)) to separate the three lanes (2 sets of "lines")
     for (int j=0; j<(VIEW_HEIGHT / (4*SPRITE_HEIGHT)); j++){
         m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, LEFT_EDGE + ROAD_WIDTH/3, j *
-                                                (4*SPRITE_HEIGHT), 0, 2.0, 2, -4, 0, false, this));
+                                                (4*SPRITE_HEIGHT), 0, 2.0, 2, -4, this));
         m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, RIGHT_EDGE - ROAD_WIDTH/3, j *
-                                                (4*SPRITE_HEIGHT), 0, 2.0, 2, -4, 0, false, this));
+                                                (4*SPRITE_HEIGHT), 0, 2.0, 2, -4, this));
     }
     
     return GWSTATUS_CONTINUE_GAME;
@@ -99,12 +102,12 @@ int StudentWorld::move()
     double m_last_white_y_added = m_listOfActors.front()->getY();   //TODO: MAKE SURE UR ONLY PUSHING WHITE BORDERS TO FRONT!!! EVERYTHING ELSE TO BACK!
     double delta_y = new_border_y - m_last_white_y_added;
     if (delta_y >= SPRITE_HEIGHT){
-        m_listOfActors.push_back(new BorderLine(IID_YELLOW_BORDER_LINE, ROAD_CENTER - ROAD_WIDTH/2, new_border_y, 0, 2.0, 2, -4, 0, false, this));
-        m_listOfActors.push_back(new BorderLine(IID_YELLOW_BORDER_LINE, ROAD_CENTER + ROAD_WIDTH/2, new_border_y, 0, 2.0, 2, -4, 0, false, this));
+        addActor(new BorderLine(IID_YELLOW_BORDER_LINE, ROAD_CENTER - ROAD_WIDTH/2, new_border_y, 0, 2.0, 2, -4, this));
+        addActor(new BorderLine(IID_YELLOW_BORDER_LINE, ROAD_CENTER + ROAD_WIDTH/2, new_border_y, 0, 2.0, 2, -4, this));
     }
     if (delta_y >= 4*SPRITE_HEIGHT){
-        m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH/3, new_border_y, 0, 2.0, 2, -4, 0, false, this));
-        m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH/3, new_border_y, 0, 2.0, 2, -4, 0, false, this));
+        m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH/3, new_border_y, 0, 2.0, 2, -4, this));
+        m_listOfActors.push_front(new BorderLine(IID_WHITE_BORDER_LINE, ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH/3, new_border_y, 0, 2.0, 2, -4, this));
     }
     
     // Update the Game Status Line
@@ -142,3 +145,42 @@ StudentWorld::~StudentWorld(){
 GhostRacer* StudentWorld::getPointerToGhostRacer() const {
     return m_pointerToGhostRacer;
 }
+
+// Add an actor to the world (works for all actors except Ghost Rider and White BLs).
+void StudentWorld::addActor(Actor* a){
+    m_listOfActors.push_back(a);    //push all actors to back of list EXCEPT FOR WHITE BORDER LINES (push those manually to front!)
+}
+
+// Record that a soul was saved.
+void StudentWorld::recordSoulSaved(){
+    m_numSoulsToSave--;
+}
+
+//TODO: IMPLEMENT THIS MEMBER FUNCTION (+delete any ones u didn't want to use FROM HERE DOWN !)
+// If actor a overlaps some live actor that is affected by a holy water
+// projectile, inflict a holy water spray on that actor and return true;
+// otherwise, return false.  (See Actor::beSprayedIfAppropriate.)
+bool StudentWorld::sprayFirstAppropriateActor(Actor* a){
+    return true;
+}
+
+// Return true if actor a1 overlaps actor a2, otherwise false.
+bool StudentWorld::overlaps(const Actor* a1, const Actor* a2) const {
+    double delta_x = abs(a1->getX() - a2->getX());  //TODO: does abs work for double or do i have to includ <cmath> header?
+    double delta_y = abs(a1->getY() - a2->getY());
+    double radius_sum = a1->getRadius() + a2->getRadius();
+    if (delta_x < radius_sum*.25 && delta_y < radius_sum*.6){
+        return true;
+    }
+    return false;
+}
+
+// If actor a overlaps this world's GhostRacer, return a pointer to the
+// GhostRacer; otherwise, return nullptr
+GhostRacer* StudentWorld::getOverlappingGhostRacer(Actor* a) const {
+    if (overlaps(a, getPointerToGhostRacer())){
+        return getPointerToGhostRacer();
+    }
+    return nullptr;
+}
+
