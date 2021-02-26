@@ -652,6 +652,20 @@ bool GhostRacerActivatedObject::beSprayedIfAppropriate(){
     }
 }
 
+void GhostRacerActivatedObject::doSomething(){
+    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
+        return;
+    }
+    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
+        doActivity(getStudentWorld()->getPointerToGhostRacer()); 
+        if (selfDestructs()){
+            changeAlive(false);
+        }
+        getStudentWorld()->playSound(getSound());
+        getStudentWorld()->increaseScore(getScoreIncrease());
+    }
+}
+
   // Return the sound to be played when the object is activated.
 int GhostRacerActivatedObject::getSound() const {
     return SOUND_GOT_GOODIE;
@@ -665,17 +679,7 @@ OilSlick::OilSlick(int imageID, double startX, double startY,
 : GhostRacerActivatedObject(imageID, startX, startY, startDirection, size, sw)
 { }
 
-void OilSlick::doSomething(){
-    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
-        return;
-    }
-    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
-        doActivity(getStudentWorld()->getPointerToGhostRacer());
-    }
-}
-
 void OilSlick::doActivity(GhostRacer* gr){
-    getStudentWorld()->playSound(getSound());
     gr->spin();
 }
 
@@ -703,20 +707,8 @@ HealingGoodie::HealingGoodie(int imageID, double startX, double startY,
 : GhostRacerActivatedObject(imageID, startX, startY, startDirection, size, sw)
 { }
 
-void HealingGoodie::doSomething(){
-    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
-        return;
-    }
-    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
-        doActivity(getStudentWorld()->getPointerToGhostRacer());    //TODO: GO BACK THRU THESE AND CHECK DUPLICATIONS? REPETITION?
-    }
-}
-
 void HealingGoodie::doActivity(GhostRacer* gr){
     gr->heal(10);
-    changeAlive(false);
-    getStudentWorld()->playSound(getSound());
-    getStudentWorld()->increaseScore(getScoreIncrease()); //TODO: EX. USE HARD CODE?? DO I NEED THE BELOW FUNCTIONS?
 }
 
 int HealingGoodie::getScoreIncrease() const {
@@ -739,20 +731,8 @@ HolyWaterGoodie::HolyWaterGoodie(int imageID, double startX, double startY,
 : GhostRacerActivatedObject(imageID, startX, startY, startDirection, size, sw)
 { }
 
-void HolyWaterGoodie::doSomething(){
-    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
-        return;
-    }
-    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
-        doActivity(getStudentWorld()->getPointerToGhostRacer());    //TODO: GO BACK THRU THESE AND CHECK DUPLICATIONS? REPETITION?
-    }
-}
-
 void HolyWaterGoodie::doActivity(GhostRacer* gr) {
     gr->changeNumSprays(10);
-    changeAlive(false);
-    getStudentWorld()->playSound(getSound());
-    getStudentWorld()->increaseScore(getScoreIncrease());   //TODO: FIGURE OUT HOW TO LIMIT REPETITION?
 }
 
 int HolyWaterGoodie::getScoreIncrease() const {
@@ -780,16 +760,16 @@ void SoulGoodie::doSomething(){
         return;
     }
     if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
-        doActivity(getStudentWorld()->getPointerToGhostRacer());    //TODO: GO BACK THRU THESE AND CHECK DUPLICATIONS? REPETITION?
+        doActivity(getStudentWorld()->getPointerToGhostRacer());
+        changeAlive(false);
+        getStudentWorld()->playSound(getSound());
+        getStudentWorld()->increaseScore(getScoreIncrease());
     }
     setDirection(getDirection()-10);
 }
 
 void SoulGoodie::doActivity(GhostRacer* gr){
     getStudentWorld()->recordSoulSaved();
-    changeAlive(false);
-    getStudentWorld()->playSound(getSound());
-    getStudentWorld()->increaseScore(getScoreIncrease());   //TODO: FIGURE OUT HOW TO LIMIT REPETITION?
 }
 
 int SoulGoodie::getScoreIncrease() const {

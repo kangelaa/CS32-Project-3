@@ -516,6 +516,40 @@
 			<key>uniqueIdentifier</key>
 			<string>39554B21-836E-44C1-B23C-B076FC08584A</string>
 		</dict>
+		<key>3EB9591C-D543-464E-83C3-845169D171AF</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>3EB9591C-D543-464E-83C3-845169D171AF.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>GhostRacer project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>GhostRacer</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Run GhostRacer</string>
+			<key>timeStartedRecording</key>
+			<real>636063744.23259199</real>
+			<key>timeStoppedRecording</key>
+			<real>636063768.709342</real>
+			<key>title</key>
+			<string>Run GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>3EB9591C-D543-464E-83C3-845169D171AF</string>
+		</dict>
 		<key>43C3BB61-27BA-4AC7-82E9-A7A75C0D5DAE</key>
 		<dict>
 			<key>className</key>
@@ -1094,6 +1128,40 @@
 			<key>uniqueIdentifier</key>
 			<string>8BB54675-7E7A-446C-A88C-8A42C13411C6</string>
 		</dict>
+		<key>8BC507CF-8EC6-4D90-96AA-5301C72025CF</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>8BC507CF-8EC6-4D90-96AA-5301C72025CF.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>GhostRacer project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>GhostRacer</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Run GhostRacer</string>
+			<key>timeStartedRecording</key>
+			<real>636063777.653741</real>
+			<key>timeStoppedRecording</key>
+			<real>636063781.67026699</real>
+			<key>title</key>
+			<string>Run GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>8BC507CF-8EC6-4D90-96AA-5301C72025CF</string>
+		</dict>
 		<key>9644DB85-9580-4E46-B838-3036DF166707</key>
 		<dict>
 			<key>className</key>
@@ -1536,6 +1604,40 @@
 			<key>uniqueIdentifier</key>
 			<string>D1FECB2E-0E8F-4066-AB7B-33688ED5E94A</string>
 		</dict>
+		<key>D582CA77-2768-4806-87BE-12272146FD44</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>D582CA77-2768-4806-87BE-12272146FD44.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>GhostRacer project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>GhostRacer</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Run GhostRacer</string>
+			<key>timeStartedRecording</key>
+			<real>636024519.40475094</real>
+			<key>timeStoppedRecording</key>
+			<real>636024643.26984799</real>
+			<key>title</key>
+			<string>Run GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>D582CA77-2768-4806-87BE-12272146FD44</string>
+		</dict>
 		<key>DE498D43-52DC-4BC0-BAE1-21BDE72DC33D</key>
 		<dict>
 			<key>className</key>
@@ -1705,6 +1807,40 @@
 			<string>Run GhostRacer</string>
 			<key>uniqueIdentifier</key>
 			<string>F7855111-7DFF-4EF3-9372-ADF29D0DD93D</string>
+		</dict>
+		<key>FB796834-99EA-49A5-81B5-DB84E8E38A14</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>FB796834-99EA-49A5-81B5-DB84E8E38A14.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>GhostRacer project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>GhostRacer</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Run GhostRacer</string>
+			<key>timeStartedRecording</key>
+			<real>636023627.75840604</real>
+			<key>timeStoppedRecording</key>
+			<real>636023688.74855602</real>
+			<key>title</key>
+			<string>Run GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>FB796834-99EA-49A5-81B5-DB84E8E38A14</string>
 		</dict>
 	</dict>
 </dict>

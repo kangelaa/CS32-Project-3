@@ -9,7 +9,7 @@ class StudentWorld;
 
 class Actor : public GraphObject
 {
-public:     //TODO: GO IN LATER AND CHANGE EVERYTHING TO VIRTUAL/VIRTUAL PURE/CONST , private/protected/public AS NECESSARY FOR ALL CLASSES!
+public:     //TODO: GO IN LATER AND CHANGE EVERYTHING TO VIRTUAL/VIRTUAL PURE, private/protected/public AS NECESSARY FOR ALL CLASSES!
     Actor(int imageID, double startX, double startY,
           int startDirection, double size, int depth,
           StudentWorld* sw);
@@ -182,7 +182,9 @@ public:
                               StudentWorld* sw);
     ~GhostRacerActivatedObject(){ }
     virtual bool beSprayedIfAppropriate();
-
+    
+    virtual void doSomething();
+    
       // Do the object's special activity (increase health, spin Ghostracer, etc.)
     virtual void doActivity(GhostRacer* gr) = 0;
 
@@ -207,7 +209,6 @@ public:
              int startDirection, double size,
              StudentWorld* sw);
     ~OilSlick(){ }
-    virtual void doSomething();
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual int getSound() const;
@@ -223,7 +224,6 @@ public:
                   int startDirection, double size,
                   StudentWorld* sw);
     ~HealingGoodie(){ }
-    virtual void doSomething();
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual bool selfDestructs() const;
@@ -238,7 +238,6 @@ public:
                     int startDirection, double size,
                     StudentWorld* sw);
     ~HolyWaterGoodie(){ }
-    virtual void doSomething();
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual bool selfDestructs() const;
