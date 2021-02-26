@@ -42,9 +42,8 @@ bool Actor::isCollisionAW() const {
     return false;
 }
 
-//Mutator //TODO: IMPLEMENT THIS ONE
 bool Actor::beSprayedIfAppropriate(){
-    return true;
+    return false;
 }
 
 //Accessor
@@ -56,9 +55,19 @@ StudentWorld* Actor::getStudentWorld() const {
       // determined by this actor's vertical speed relative to GhostRacser's
       // vertical speed.  Return true if the new position is within the view;
       // otherwise, return false, with the actor dead.
-//TODO: IMPLEMENT THIS ONE
 bool Actor::moveRelativeToGhostRacerVerticalSpeed(double dx){
-    return false;
+    int vert_speed = getVertSpeed() - getStudentWorld()->getPointerToGhostRacer()->getVertSpeed();
+    int horiz_speed = dx;
+    double new_y = getY() + vert_speed;
+    double new_x = getX() + horiz_speed;
+    moveTo(new_x, new_y);
+    
+    //if Agent leaves the screen, set its status to not-alive, so it will be removed by StudentWorld later in this tick
+    if (getX() < 0 || getX() > VIEW_WIDTH || getY() < 0 || getY() > VIEW_HEIGHT){
+        changeAlive(false);
+        return false;
+    }
+    return true;
 }
 
 // BorderLine MEMBER FUNCTION IMPLEMENTATIONS
@@ -74,18 +83,8 @@ BorderLine::BorderLine(int imageID, double startX, double startY,
 
 //has BorderLine lines move down the screen
 void BorderLine::doSomething(){
-    //TODO: IMPLEMENT! + FIX THE CODE DUPLICATIONS (move() in actor? add BorderLine to actor?)
-    
     //move BorderLine using algorithm
-    int vert_speed = getVertSpeed() - (getStudentWorld()->getPointerToGhostRacer()->getVertSpeed());    //TODO: CHECK IS THIS CORRECT?
-    int horiz_speed = 0;
-    double new_y = getY() + vert_speed;
-    double new_x = getX() + horiz_speed;
-    moveTo(new_x, new_y);   //update x and y location for BorderLine w/ moveTo()
-    
-    //if BorderLine leaves the screen, set its status to not-alive, so it will be removed by StudentWorld later in this tick
-    if (getX() < 0 || getX() > VIEW_WIDTH || getY() < 0 || getY() > VIEW_HEIGHT){
-        changeAlive(false);
+    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
         return;
     }
 }
@@ -163,8 +162,6 @@ GhostRacer::GhostRacer(int imageID, double startX, double startY,
 
 //has GhostRacer read in user input (key press) and update direction/x/y accordingly
 void GhostRacer::doSomething(){
-    //TODO: FINISH UP for pt 2!
-    
     //if GhostRacer isn't alive, return immediately
     if (getHitPoints() <= 0){
         return;
@@ -179,19 +176,35 @@ void GhostRacer::doSomething(){
             takeDamageAndPossiblyDie(10);
         }
         setDirection(82);
-        getStudentWorld()->playSound(SOUND_VEHICLE_CRASH);
+        getStudentWorld()->playSound(soundWhenHurt());
     } else if (getX() >= RIGHT_EDGE){
         if (getDirection() < 90){
             takeDamageAndPossiblyDie(10);
         }
         setDirection(98);
-        getStudentWorld()->playSound(SOUND_VEHICLE_CRASH); //TODO: SEARCH AND REPLACE ALL SOUND W/ MEMEBR FUNCTIONS
+        getStudentWorld()->playSound(soundWhenHurt()); 
     } else if (getStudentWorld()->getKey(ch)){   //check for user input (key press)
         //user hit a key during this tick!
         switch (ch){
             case KEY_PRESS_SPACE:
                 if (getNumSprays() >= 1){
-                    //TODO: IMPLEMENT THIS PART pg 30! (a.i.)
+                    //add a new water spray directly in front of GR in whatever direction it's facing
+                    int angleDegRef = getStudentWorld()->getPointerToGhostRacer()->getDirection();  //get dir in degrees
+                    int angleDeg;
+                    if (angleDegRef > 90){  //find acute angle
+                        angleDeg = 180 - angleDegRef;
+                    } else {
+                        angleDeg = angleDegRef;
+                    }
+                    double angleRad = angleDeg * (M_PI/180);    //convert deg to rad
+                    double delta_x = cos(angleRad) * SPRITE_HEIGHT; //calculate delta_x
+                    double delta_y = sin(angleRad) * SPRITE_HEIGHT; //calculate delta_y
+                    if (angleDegRef > 90){
+                        delta_x *= (-1);        //delta_x is subtracted from GR's getX() if the original dir was > 90
+                    }
+                    getStudentWorld()->addActor(new Spray(IID_HOLY_WATER_PROJECTILE, getStudentWorld()->getPointerToGhostRacer()->getX() + delta_x, getStudentWorld()->getPointerToGhostRacer()->getY() + delta_y,
+                                                          angleDegRef, 1.0, 1,
+                                                          getStudentWorld()));
                     getStudentWorld()->playSound(SOUND_PLAYER_SPRAY);
                     changeNumSprays(-1);
                 }
@@ -273,7 +286,7 @@ IntelligentAgent::IntelligentAgent(int imageID, double startX, double startY,
                    int startDirection, double size,
                    StudentWorld* sw,
                    int hitPoints)
-: Agent(imageID, startX, startY, startDirection, size, sw, hitPoints) //TODO: ZOMBIE CAB STARTS OFF W/ 3 HP!, other two 2
+: Agent(imageID, startX, startY, startDirection, size, sw, hitPoints)
 {
     m_movementPlan = 0;
     setHorizSpeed(0);
@@ -292,19 +305,11 @@ void IntelligentAgent::setMovementPlan(int plan){
 // Move the agent.  If the agent doesn't go off screen and
 // should pick a new movement plan, pick a new plan.
 void IntelligentAgent::moveAndPossiblyPickPlan(){
-    int vert_speed = getVertSpeed() - getStudentWorld()->getPointerToGhostRacer()->getVertSpeed();
-    int horiz_speed = getHorizSpeed();
-    double new_y = getY() + vert_speed;
-    double new_x = getX() + horiz_speed;
-    moveTo(new_x, new_y);
-    
-    //if Agent leaves the screen, set its status to not-alive, so it will be removed by StudentWorld later in this tick
-    if (getX() < 0 || getX() > VIEW_WIDTH || getY() < 0 || getY() > VIEW_HEIGHT){
-        changeAlive(false);
+    if (!moveRelativeToGhostRacerVerticalSpeed(getHorizSpeed())){
         return;
     }
     
-    //works for human ped/zombie cab, not zombie ped
+    //works for human ped, not zombie ped or zombie cab (cab is same but w/ extra added to the start)
     if(updateMovementPlan()){
         return;     //return immediately if plan is > 0
     }
@@ -429,8 +434,9 @@ void ZombiePedestrian::doSomething(){
     moveAndPossiblyPickPlan();
 }
 
-//TODO: IMPLEMENT? !
 bool ZombiePedestrian::beSprayedIfAppropriate(){
+    bool died = takeDamageAndPossiblyDie(1);
+    zombiePedSpecificDamage(died);
     return true;
 }
 
@@ -456,16 +462,111 @@ void ZombiePedestrian::zombiePedSpecificDamage(bool died){
         if (getStudentWorld()->getOverlappingGhostRacer(this) == nullptr){
             int chance = randInt(1, 5);
             if (chance == 1){
-                //TODO: IMPLEMENT ADD A NEW GOODIE AT CURRENT POS pg 37
+                //add a new HealingGoodie at current pos of ZombiePedestrian
+                getStudentWorld()->addActor(new HealingGoodie(IID_HEAL_GOODIE, getX(), getY(),
+                                                              0, 1.0,
+                                                              getStudentWorld()));
             }
         }
         getStudentWorld()->increaseScore(150);
     } else {
-        getStudentWorld()->playSound(SOUND_PED_HURT);
+        getStudentWorld()->playSound(soundWhenHurt());
     }
 }
 
 // ZombieCab MEMBER FUNCTION IMPLEMENTATIONS
+
+ZombieCab::ZombieCab(int imageID, double startX, double startY,
+          int startDirection, double size,
+          StudentWorld* sw,
+          int hitPoints, int vertSpeed)
+: IntelligentAgent(imageID, startX, startY, startDirection, size, sw, hitPoints)
+{
+    setVertSpeed(vertSpeed);
+    m_damagedGRYet = false;
+}
+
+void ZombieCab::doSomething(){
+    //if zombie cab isn't alive, return immediately
+    if (getHitPoints() <= 0){
+        return;
+    }
+    
+    //if zombie cab overlaps w/ GR (#2)
+    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
+        if (m_damagedGRYet == false){
+            getStudentWorld()->playSound(SOUND_VEHICLE_CRASH);
+            getStudentWorld()->getPointerToGhostRacer()->takeDamageAndPossiblyDie(20);
+            if (getX() <= getStudentWorld()->getPointerToGhostRacer()->getX()){
+                setHorizSpeed(-5);
+                setDirection(120+randInt(0, 19));
+            } else {
+                setHorizSpeed(5);
+                setDirection(60-randInt(0, 19));
+            }
+            m_damagedGRYet = true;
+        }
+    }
+    
+    //move, update plan distance (#3-6)
+    moveAndPossiblyPickPlan();
+}
+
+bool ZombieCab::beSprayedIfAppropriate(){
+    bool died = takeDamageAndPossiblyDie(1);
+    zombieCabSpecificDamage(died);
+    return true;
+}
+
+int ZombieCab::soundWhenHurt() const{
+    return SOUND_VEHICLE_HURT;
+}
+
+int ZombieCab::soundWhenDie() const{
+    return SOUND_VEHICLE_DIE;
+}
+
+//Private functions
+
+bool ZombieCab::updateMovementPlan(){
+    // (#4-7 on pg 39)
+    int leftX;
+    int rightX;
+    int LEFT_EDGE = ROAD_CENTER - ROAD_WIDTH/2;
+    int RIGHT_EDGE = ROAD_CENTER + ROAD_WIDTH/2;
+    
+    if (getX() == ROAD_CENTER - ROAD_WIDTH/3){  //left lane check
+        leftX = LEFT_EDGE;
+        rightX = LEFT_EDGE + ROAD_WIDTH/3;
+    } else if (getX() == ROAD_CENTER){  //middle lane check
+        leftX = LEFT_EDGE + ROAD_WIDTH/3;
+        rightX = RIGHT_EDGE - ROAD_WIDTH/3;
+    } else {    //right lane check
+        leftX = RIGHT_EDGE - ROAD_WIDTH/3;
+        rightX = RIGHT_EDGE;
+    }
+    
+    if (getVertSpeed() > getStudentWorld()->getPointerToGhostRacer()->getVertSpeed() && getStudentWorld()->getClosestCAWinFrontOrBehind(leftX, rightX, getY(), true) != nullptr){
+        if (getStudentWorld()->getClosestCAWinFrontOrBehind(leftX, rightX, getY(), true)->getY() - getY() < 96){
+            setVertSpeed(getVertSpeed()-.5);
+            return true;
+        }
+    }
+    
+    if (getVertSpeed() <= getStudentWorld()->getPointerToGhostRacer()->getVertSpeed() && getStudentWorld()->getClosestCAWinFrontOrBehind(leftX, rightX, getY(), false) != nullptr){
+        if (getY() - getStudentWorld()->getClosestCAWinFrontOrBehind(leftX, rightX, getY(), false)->getY() < 96 && getStudentWorld()->getClosestCAWinFrontOrBehind(leftX, rightX, getY(), false) != getStudentWorld()->getPointerToGhostRacer()){
+            setVertSpeed(getVertSpeed()+.5);
+            return true;
+        }
+    }
+
+    //decrement movement plan distance
+    setMovementPlan(getMovementPlan()-1);
+    if (getMovementPlan() > 0){
+        return true;    //this tells the caller of this function to return immediately if bool = true
+    }
+    return false;
+}
 
 void ZombieCab::pickNewPlan(){
     //pick new movement plan for zombie cab
@@ -475,3 +576,234 @@ void ZombieCab::pickNewPlan(){
     setVertSpeed(getVertSpeed()+randInt(-2, 2));
 }
 
+//if this bool function returns true, return immediately
+bool ZombieCab::zombieCabSpecificDamage(bool died){
+    if (died){
+        int chance = randInt(1, 5);
+        if (chance == 1){
+            //add new oil slick at current ZombieCab position
+            double size = randInt(2, 5);
+            getStudentWorld()->addActor(new OilSlick(IID_OIL_SLICK, getX(), getY(),
+                                                     0, size,
+                                                     getStudentWorld()));
+        }
+        getStudentWorld()->increaseScore(200);
+        return true;
+    } else {
+        getStudentWorld()->playSound(soundWhenHurt());
+        return false;
+    }
+}
+
+//Spray MEMBER FUNCTION IMPLEMENTATIONS
+
+Spray::Spray(int imageID, double startX, double startY,
+             int startDirection, double size, int depth,
+             StudentWorld* sw)
+: Actor(imageID, startX, startY, startDirection, size, depth, sw)
+{
+    m_travelDistLeft = 160;
+}
+
+void Spray::doSomething(){
+    //if spray isn't alive, return immediately
+    if (!isAlive()){
+        return;
+    }
+    
+    // check to see if there are any sprayable actors currently overlapping w/ spray, spray them, change spray status to not alive, and return immediately (#2)
+    if (getStudentWorld()->sprayFirstAppropriateActor(this)){
+        changeAlive(false);
+        return;
+    }
+    
+    // move spray forward (#3-5) and decrement m_travelDistLeft by the # of pixels moved
+    moveForward(SPRITE_HEIGHT);
+    m_travelDistLeft -= SPRITE_HEIGHT;
+    
+    //kill spray if off screen
+    if (getX() < 0 || getX() > VIEW_WIDTH || getY() < 0 || getY() > VIEW_HEIGHT){
+        changeAlive(false);
+        return;
+    }
+    
+    //if spray traveled max dist (160 pixels), kill it
+    if (m_travelDistLeft <= 0){
+        changeAlive(false);
+    }
+}
+
+// GhostRacerActivatedObject MEMBER FUNCTION IMPLEMENTATIONS
+
+GhostRacerActivatedObject::GhostRacerActivatedObject(int imageID, double startX, double startY,
+                                                     int startDirection, double size,
+                                                     StudentWorld* sw)
+: Actor(imageID, startX, startY, startDirection, size, 2, sw)
+{
+    setVertSpeed(-4);
+}
+
+bool GhostRacerActivatedObject::beSprayedIfAppropriate(){
+    if (isSprayable()){
+        changeAlive(false);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+  // Return the sound to be played when the object is activated.
+int GhostRacerActivatedObject::getSound() const {
+    return SOUND_GOT_GOODIE;
+}
+
+// OilSlick MEMBER FUNCTION IMPLEMENTATIONS
+
+OilSlick::OilSlick(int imageID, double startX, double startY,
+                   int startDirection, double size,
+                   StudentWorld* sw)
+: GhostRacerActivatedObject(imageID, startX, startY, startDirection, size, sw)
+{ }
+
+void OilSlick::doSomething(){
+    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
+        return;
+    }
+    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
+        doActivity(getStudentWorld()->getPointerToGhostRacer());
+    }
+}
+
+void OilSlick::doActivity(GhostRacer* gr){
+    getStudentWorld()->playSound(getSound());
+    gr->spin();
+}
+
+int OilSlick::getScoreIncrease() const {
+    return 0;
+}
+
+int OilSlick::getSound() const {
+    return SOUND_OIL_SLICK;
+}
+
+bool OilSlick::selfDestructs() const {
+    return false;
+}
+
+bool OilSlick::isSprayable() const {
+    return false;
+}
+
+// HealingGoodie MEMBER FUNCTION IMPLEMENTATIONS
+
+HealingGoodie::HealingGoodie(int imageID, double startX, double startY,
+                             int startDirection, double size,
+                             StudentWorld* sw)
+: GhostRacerActivatedObject(imageID, startX, startY, startDirection, size, sw)
+{ }
+
+void HealingGoodie::doSomething(){
+    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
+        return;
+    }
+    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
+        doActivity(getStudentWorld()->getPointerToGhostRacer());    //TODO: GO BACK THRU THESE AND CHECK DUPLICATIONS? REPETITION?
+    }
+}
+
+void HealingGoodie::doActivity(GhostRacer* gr){
+    gr->heal(10);
+    changeAlive(false);
+    getStudentWorld()->playSound(getSound());
+    getStudentWorld()->increaseScore(getScoreIncrease()); //TODO: EX. USE HARD CODE?? DO I NEED THE BELOW FUNCTIONS?
+}
+
+int HealingGoodie::getScoreIncrease() const {
+    return 250;
+}
+
+bool HealingGoodie::selfDestructs() const {
+    return true;
+}
+
+bool HealingGoodie::isSprayable() const {
+    return true;
+}
+
+// HolyWaterGoodie MEMBER FUNCTION IMPLEMENTATIONS
+
+HolyWaterGoodie::HolyWaterGoodie(int imageID, double startX, double startY,
+                                 int startDirection, double size,
+                                 StudentWorld* sw)
+: GhostRacerActivatedObject(imageID, startX, startY, startDirection, size, sw)
+{ }
+
+void HolyWaterGoodie::doSomething(){
+    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
+        return;
+    }
+    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
+        doActivity(getStudentWorld()->getPointerToGhostRacer());    //TODO: GO BACK THRU THESE AND CHECK DUPLICATIONS? REPETITION?
+    }
+}
+
+void HolyWaterGoodie::doActivity(GhostRacer* gr) {
+    gr->changeNumSprays(10);
+    changeAlive(false);
+    getStudentWorld()->playSound(getSound());
+    getStudentWorld()->increaseScore(getScoreIncrease());   //TODO: FIGURE OUT HOW TO LIMIT REPETITION?
+}
+
+int HolyWaterGoodie::getScoreIncrease() const {
+    return 50;
+}
+
+bool HolyWaterGoodie::selfDestructs() const{
+    return true;
+}
+
+bool HolyWaterGoodie::isSprayable() const {
+    return true;
+}
+
+// SoulGoodie MEMBER FUNCTION IMPLEMENTATIONS
+
+SoulGoodie::SoulGoodie(int imageID, double startX, double startY,
+                       int startDirection, double size,
+                       StudentWorld* sw)
+: GhostRacerActivatedObject(imageID, startX, startY, startDirection, size, sw)
+{ }
+
+void SoulGoodie::doSomething(){
+    if(!moveRelativeToGhostRacerVerticalSpeed(0)){
+        return;
+    }
+    if (getStudentWorld()->getOverlappingGhostRacer(this) != nullptr){
+        doActivity(getStudentWorld()->getPointerToGhostRacer());    //TODO: GO BACK THRU THESE AND CHECK DUPLICATIONS? REPETITION?
+    }
+    setDirection(getDirection()-10);
+}
+
+void SoulGoodie::doActivity(GhostRacer* gr){
+    getStudentWorld()->recordSoulSaved();
+    changeAlive(false);
+    getStudentWorld()->playSound(getSound());
+    getStudentWorld()->increaseScore(getScoreIncrease());   //TODO: FIGURE OUT HOW TO LIMIT REPETITION?
+}
+
+int SoulGoodie::getScoreIncrease() const {
+    return 100;
+}
+
+int SoulGoodie::getSound() const {
+    return SOUND_GOT_SOUL;
+}
+
+bool SoulGoodie::selfDestructs() const {
+    return true;
+}
+
+bool SoulGoodie::isSprayable() const {
+    return false;
+}

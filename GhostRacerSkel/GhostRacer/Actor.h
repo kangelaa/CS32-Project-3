@@ -9,7 +9,7 @@ class StudentWorld;
 
 class Actor : public GraphObject
 {
-public:     //TODO: GO IN LATER AND CHANGE EVERYTHING TO VIRTUAL/VIRTUAL PURE/CONST AS NECESSARY FOR ALL CLASSES!
+public:     //TODO: GO IN LATER AND CHANGE EVERYTHING TO VIRTUAL/VIRTUAL PURE/CONST , private/protected/public AS NECESSARY FOR ALL CLASSES!
     Actor(int imageID, double startX, double startY,
           int startDirection, double size, int depth,
           StudentWorld* sw);
@@ -20,18 +20,17 @@ public:     //TODO: GO IN LATER AND CHANGE EVERYTHING TO VIRTUAL/VIRTUAL PURE/CO
     int getVertSpeed() const;
     void setVertSpeed(int vSpeed); //parameter passed is the new value
     virtual bool isCollisionAW() const; //Does this object affect zombie cab placement and speed?
-    virtual bool beSprayedIfAppropriate(); //TODO: DO I NEED THIS?
+    virtual bool beSprayedIfAppropriate();
     StudentWorld* getStudentWorld() const;
     // Adjust the x coordinate by dx to move to a position with a y coordinate
           // determined by this actor's vertical speed relative to GhostRacser's
           // vertical speed.  Return true if the new position is within the view;
           // otherwise, return false, with the actor dead.
-    virtual bool moveRelativeToGhostRacerVerticalSpeed(double dx); //TODO: DO I NEED THIS?
+    virtual bool moveRelativeToGhostRacerVerticalSpeed(double dx);
 private:
     bool m_alive;
     int m_vertSpeed;
     StudentWorld* m_sw;
-    //TODO: ADD IN DATA MEMBERS/FUNCTIONS AS NECESSARY, ADD ACCESSOR/MUTATORS FOR PRIV DATA MEMBERS; FOR ALL CLASSES!
 };
 
 class BorderLine : public Actor
@@ -79,7 +78,7 @@ private:
 
 class GhostRacer : public Agent
 {
-public: //TODO: GO IN LATER AND UDPATE EVERYTHING TO VIRTUAL AS NECESSARY
+public:
     GhostRacer(int imageID, double startX, double startY,
                int startDirection, double size,
                int vertSpeed, int horizSpeed, StudentWorld* sw,
@@ -94,8 +93,6 @@ public: //TODO: GO IN LATER AND UDPATE EVERYTHING TO VIRTUAL AS NECESSARY
 private:
     int m_holyWaterAmount;
 };
-
-//TODO: ORGANIZE HOW MANY OTHER DERIVED CLASSES THAT AREN'T DIRECT ACTORS? (3?) (CHECK BELOW)!
 
 class IntelligentAgent : public Agent
 {
@@ -152,95 +149,117 @@ public:
     ZombieCab(int imageID, double startX, double startY,
               int startDirection, double size,
               StudentWorld* sw,
-              int hitPoints);
+              int hitPoints, int vertSpeed);
     ~ZombieCab(){ }
     virtual void doSomething();
     virtual bool beSprayedIfAppropriate();
     virtual int soundWhenHurt() const;
     virtual int soundWhenDie() const;
 private:
+    virtual bool updateMovementPlan();
     virtual void pickNewPlan();
+    bool zombieCabSpecificDamage(bool died);
+    bool m_damagedGRYet;
 };
 
-//class Spray : public Actor
-//{
-//public:
-//    Spray(StudentWorld* sw, double x, double y, int dir);
-//    virtual void doSomething();
-//private:
-//};
-//
-//class GhostRacerActivatedObject : public Actor
-//{
-//public:
-//    GhostRacerActivatedObject(StudentWorld* sw, int imageID, double x, double y, double size, int dir);
-//    virtual bool beSprayedIfAppropriate();
-//
-//      // Do the object's special activity (increase health, spin Ghostracer, etc.)
-//    virtual void doActivity(GhostRacer* gr) = 0;
-//
-//      // Return the object's increase to the score when activated.
-//    virtual int getScoreIncrease() const = 0;
-//
-//      // Return the sound to be played when the object is activated.
-//    virtual int getSound() const;
-//
-//      // Return whether the object dies after activation.
-//    virtual bool selfDestructs() const = 0;
-//
-//      // Return whether the object is affected by a holy water projectile.
-//    virtual bool isSprayable() const = 0;
-//private:
-//};
-//
-//class OilSlick : public GhostRacerActivatedObject
-//{
-//public:
-//    OilSlick(StudentWorld* sw, double x, double y);
-//    virtual void doSomething();
-//    virtual void doActivity(GhostRacer* gr);
-//    virtual int getScoreIncrease() const;
-//    virtual int getSound() const;
-//    virtual bool selfDestructs() const;
-//    virtual bool isSprayable() const;
-//private:
-//};
-//
-//class HealingGoodie : public GhostRacerActivatedObject
-//{
-//public:
-//    HealingGoodie(StudentWorld* sw, double x, double y);
-//    virtual void doSomething();
-//    virtual void doActivity(GhostRacer* gr);
-//    virtual int getScoreIncrease() const;
-//    virtual bool selfDestructs() const;
-//    virtual bool isSprayable() const;
-//private:
-//};
-//
-//class HolyWaterGoodie : public GhostRacerActivatedObject
-//{
-//public:
-//    HolyWaterGoodie(StudentWorld* sw, double x, double y);
-//    virtual void doSomething();
-//    virtual void doActivity(GhostRacer* gr);
-//    virtual int getScoreIncrease() const;
-//    virtual bool selfDestructs() const;
-//    virtual bool isSprayable() const;
-//private:
-//};
-//
-//class SoulGoodie : public GhostRacerActivatedObject
-//{
-//public:
-//    SoulGoodie(StudentWorld* sw, double x, double y);
-//    virtual void doSomething();
-//    virtual void doActivity(GhostRacer* gr);
-//    virtual int getScoreIncrease() const;
-//    virtual int getSound() const;
-//    virtual bool selfDestructs() const;
-//    virtual bool isSprayable() const;
-//private:
-//};
-//
+class Spray : public Actor
+{
+public:
+    Spray(int imageID, double startX, double startY,
+          int startDirection, double size, int depth,
+          StudentWorld* sw);
+    ~Spray(){ }
+    virtual void doSomething();
+private:
+    int m_travelDistLeft;
+};
+
+class GhostRacerActivatedObject : public Actor
+{
+public:
+    GhostRacerActivatedObject(int imageID, double startX, double startY,
+                              int startDirection, double size,
+                              StudentWorld* sw);
+    ~GhostRacerActivatedObject(){ }
+    virtual bool beSprayedIfAppropriate();
+
+      // Do the object's special activity (increase health, spin Ghostracer, etc.)
+    virtual void doActivity(GhostRacer* gr) = 0;
+
+      // Return the object's increase to the score when activated.
+    virtual int getScoreIncrease() const = 0;
+
+      // Return the sound to be played when the object is activated.
+    virtual int getSound() const;
+
+      // Return whether the object dies after activation.
+    virtual bool selfDestructs() const = 0;
+
+      // Return whether the object is affected by a holy water projectile.
+    virtual bool isSprayable() const = 0;
+private:
+};
+
+class OilSlick : public GhostRacerActivatedObject
+{
+public:
+    OilSlick(int imageID, double startX, double startY,
+             int startDirection, double size,
+             StudentWorld* sw);
+    ~OilSlick(){ }
+    virtual void doSomething();
+    virtual void doActivity(GhostRacer* gr);
+    virtual int getScoreIncrease() const;
+    virtual int getSound() const;
+    virtual bool selfDestructs() const;
+    virtual bool isSprayable() const;
+private:
+};
+
+class HealingGoodie : public GhostRacerActivatedObject
+{
+public:
+    HealingGoodie(int imageID, double startX, double startY,
+                  int startDirection, double size,
+                  StudentWorld* sw);
+    ~HealingGoodie(){ }
+    virtual void doSomething();
+    virtual void doActivity(GhostRacer* gr);
+    virtual int getScoreIncrease() const;
+    virtual bool selfDestructs() const;
+    virtual bool isSprayable() const;
+private:
+};
+
+class HolyWaterGoodie : public GhostRacerActivatedObject
+{
+public:
+    HolyWaterGoodie(int imageID, double startX, double startY,
+                    int startDirection, double size,
+                    StudentWorld* sw);
+    ~HolyWaterGoodie(){ }
+    virtual void doSomething();
+    virtual void doActivity(GhostRacer* gr);
+    virtual int getScoreIncrease() const;
+    virtual bool selfDestructs() const;
+    virtual bool isSprayable() const;
+private:
+};
+
+class SoulGoodie : public GhostRacerActivatedObject
+{
+public:
+    SoulGoodie(int imageID, double startX, double startY,
+               int startDirection, double size,
+               StudentWorld* sw);
+    ~SoulGoodie(){ }
+    virtual void doSomething();
+    virtual void doActivity(GhostRacer* gr);
+    virtual int getScoreIncrease() const;
+    virtual int getSound() const;
+    virtual bool selfDestructs() const;
+    virtual bool isSprayable() const;
+private:
+};
+
 #endif // ACTOR_H_

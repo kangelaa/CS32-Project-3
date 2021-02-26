@@ -26,7 +26,6 @@ public:
     // Record that a soul was saved.
   void recordSoulSaved();
     
-    //TODO: CHOOSE MEMBER FUNCTIONS FROM HERE DOWN!
     // If actor a overlaps some live actor that is affected by a holy water
     // projectile, inflict a holy water spray on that actor and return true;
     // otherwise, return false.  (See Actor::beSprayedIfAppropriate.)
@@ -38,11 +37,18 @@ public:
     // If actor a overlaps this world's GhostRacer, return a pointer to the
     // GhostRacer; otherwise, return nullptr
   GhostRacer* getOverlappingGhostRacer(Actor* a) const;
+    
+    //Returns pointer to closest CAW actor in specified lane to specified y, nullptr if none
+  Actor* getClosestCAW(int leftX, int rightX, int y);
 
+    //Returns pointer to CAW actor in specified lane in FRONT of/BEHIND and closest to specified y, nullptr if none
+  Actor* getClosestCAWinFrontOrBehind(int leftX, int rightX, int y, bool front);
+    
 private:
     GhostRacer* m_pointerToGhostRacer;
-    std::list<Actor*> m_listOfActors; //TODO: (note) only StudentWorld should have access to this container, don't make a public member function to access it)
+    std::list<Actor*> m_listOfActors;
     int m_numSoulsToSave;
+    int m_bonus;
 };
 
 #endif // STUDENTWORLD_H_
