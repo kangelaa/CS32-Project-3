@@ -12,10 +12,6 @@ class StudentWorld : public GameWorld
 {
 public:
     StudentWorld(std::string assetPath);
-    virtual int init();
-    virtual int move();
-    virtual void cleanUp();
-    virtual ~StudentWorld();
 
     // Return a pointer to the world's GhostRacer.
     GhostRacer* getPointerToGhostRacer() const;
@@ -31,20 +27,25 @@ public:
     // otherwise, return false.  (See Actor::beSprayedIfAppropriate.)
   bool sprayFirstAppropriateActor(Actor* a);
 
-    // Return true if actor a1 overlaps actor a2, otherwise false.
-  bool overlaps(const Actor* a1, const Actor* a2) const;
-
     // If actor a overlaps this world's GhostRacer, return a pointer to the
     // GhostRacer; otherwise, return nullptr
   GhostRacer* getOverlappingGhostRacer(Actor* a) const;
     
-    //Returns pointer to closest CAW actor in specified lane to specified y, nullptr if none
-  Actor* getClosestCAW(int leftX, int rightX, int y);
-
     //Returns pointer to CAW actor in specified lane in FRONT of/BEHIND and closest to specified y, nullptr if none
   Actor* getClosestCAWinFrontOrBehind(int leftX, int rightX, int y, bool front);
     
 private:
+    virtual int init();
+    virtual int move();
+    virtual void cleanUp();
+    virtual ~StudentWorld();
+    
+    // Return true if actor a1 overlaps actor a2, otherwise false.
+  bool overlaps(const Actor* a1, const Actor* a2) const;
+    
+    //Returns pointer to closest CAW actor in specified lane to specified y, nullptr if none
+  Actor* getClosestCAW(int leftX, int rightX, int y);
+
     GhostRacer* m_pointerToGhostRacer;
     std::list<Actor*> m_listOfActors;
     int m_numSoulsToSave;

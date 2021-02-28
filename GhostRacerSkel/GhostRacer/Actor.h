@@ -9,7 +9,7 @@ class StudentWorld;
 
 class Actor : public GraphObject
 {
-public:     //TODO: GO IN LATER AND CHANGE EVERYTHING TO VIRTUAL/VIRTUAL PURE, private/protected/public AS NECESSARY FOR ALL CLASSES!
+public: 
     Actor(int imageID, double startX, double startY,
           int startDirection, double size, int depth,
           StudentWorld* sw);
@@ -39,9 +39,9 @@ public:
     BorderLine(int imageID, double startX, double startY,
                int startDirection, double size, int depth,
                int vertSpeed, StudentWorld* sw);
+private:
     virtual ~BorderLine(){ }
     virtual void doSomething();
-private:
 };
 
 class Agent : public Actor
@@ -89,8 +89,8 @@ public:
     void changeNumSprays(int waterChange);
     void spin();
     void heal(int hp);
-    virtual void moveAndPossiblyPickPlan();
 private:
+    virtual void moveAndPossiblyPickPlan();
     int m_holyWaterAmount;
 };
 
@@ -101,13 +101,13 @@ public:
                        int startDirection, double size,
                        StudentWorld* sw,
                        int hitPoints);
-    ~IntelligentAgent(){ }
+    virtual ~IntelligentAgent(){ }
     int getMovementPlan();
     void setMovementPlan(int plan);
     virtual void moveAndPossiblyPickPlan();
-    virtual bool updateMovementPlan();  //TODO: these two should be protected? or just private!?
-    virtual void pickNewPlan();
 private:
+    virtual bool updateMovementPlan();
+    virtual void pickNewPlan();
     int m_movementPlan;
 };
 
@@ -118,11 +118,11 @@ public:
                     int startDirection, double size,
                     StudentWorld* sw,
                     int hitPoints);
-    ~HumanPedestrian(){ }
+private:
+    virtual ~HumanPedestrian(){ }
     virtual void doSomething();
     virtual bool beSprayedIfAppropriate();
     virtual bool takeDamageAndPossiblyDie(int hp);
-private:
 };
 
 class ZombiePedestrian : public IntelligentAgent
@@ -132,12 +132,12 @@ public:
                      int startDirection, double size,
                      StudentWorld* sw,
                      int hitPoints);
-    ~ZombiePedestrian(){ }
+private:
+    virtual ~ZombiePedestrian(){ }
     virtual void doSomething();
-    virtual bool beSprayedIfAppropriate();
     virtual int soundWhenHurt() const;
     virtual int soundWhenDie() const;
-private:
+    virtual bool beSprayedIfAppropriate();
     virtual bool updateMovementPlan();
     void zombiePedSpecificDamage(bool died);
     int m_ticksBeforeGrunt;
@@ -150,12 +150,12 @@ public:
               int startDirection, double size,
               StudentWorld* sw,
               int hitPoints, int vertSpeed);
-    ~ZombieCab(){ }
+private:
+    virtual ~ZombieCab(){ }
     virtual void doSomething();
     virtual bool beSprayedIfAppropriate();
     virtual int soundWhenHurt() const;
     virtual int soundWhenDie() const;
-private:
     virtual bool updateMovementPlan();
     virtual void pickNewPlan();
     bool zombieCabSpecificDamage(bool died);
@@ -168,9 +168,9 @@ public:
     Spray(int imageID, double startX, double startY,
           int startDirection, double size, int depth,
           StudentWorld* sw);
-    ~Spray(){ }
-    virtual void doSomething();
 private:
+    virtual ~Spray(){ }
+    virtual void doSomething();
     int m_travelDistLeft;
 };
 
@@ -180,7 +180,8 @@ public:
     GhostRacerActivatedObject(int imageID, double startX, double startY,
                               int startDirection, double size,
                               StudentWorld* sw);
-    ~GhostRacerActivatedObject(){ }
+    virtual ~GhostRacerActivatedObject(){ }
+private:
     virtual bool beSprayedIfAppropriate();
     
     virtual void doSomething();
@@ -199,7 +200,6 @@ public:
 
       // Return whether the object is affected by a holy water projectile.
     virtual bool isSprayable() const = 0;
-private:
 };
 
 class OilSlick : public GhostRacerActivatedObject
@@ -208,13 +208,13 @@ public:
     OilSlick(int imageID, double startX, double startY,
              int startDirection, double size,
              StudentWorld* sw);
-    ~OilSlick(){ }
+private:
+    virtual ~OilSlick(){ }
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual int getSound() const;
     virtual bool selfDestructs() const;
     virtual bool isSprayable() const;
-private:
 };
 
 class HealingGoodie : public GhostRacerActivatedObject
@@ -223,12 +223,12 @@ public:
     HealingGoodie(int imageID, double startX, double startY,
                   int startDirection, double size,
                   StudentWorld* sw);
-    ~HealingGoodie(){ }
+private:
+    virtual ~HealingGoodie(){ }
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual bool selfDestructs() const;
     virtual bool isSprayable() const;
-private:
 };
 
 class HolyWaterGoodie : public GhostRacerActivatedObject
@@ -237,12 +237,12 @@ public:
     HolyWaterGoodie(int imageID, double startX, double startY,
                     int startDirection, double size,
                     StudentWorld* sw);
-    ~HolyWaterGoodie(){ }
+private:
+    virtual ~HolyWaterGoodie(){ }
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual bool selfDestructs() const;
     virtual bool isSprayable() const;
-private:
 };
 
 class SoulGoodie : public GhostRacerActivatedObject
@@ -251,14 +251,14 @@ public:
     SoulGoodie(int imageID, double startX, double startY,
                int startDirection, double size,
                StudentWorld* sw);
-    ~SoulGoodie(){ }
+private:
+    virtual ~SoulGoodie(){ }
     virtual void doSomething();
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual int getSound() const;
     virtual bool selfDestructs() const;
     virtual bool isSprayable() const;
-private:
 };
 
 #endif // ACTOR_H_

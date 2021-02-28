@@ -246,7 +246,7 @@ void GhostRacer::changeNumSprays(int waterChange){
     m_holyWaterAmount += waterChange;
 }
 
-//Mutator, spin as result of hitting oil slick
+//Spin as result of hitting oil slick
 void GhostRacer::spin(){
     int orientation = randInt(0, 1);  //pick clockwise or counterclockwise
     int angle = randInt(5, 20);
